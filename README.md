@@ -45,3 +45,12 @@ To run this project locally, follow these steps:
     flask run
     ```
 The application will be available at `http://127.0.0.1:5000`.
+## 🖼️ Preview
+
+Here's a look at the Emailify AI Assistant in action.
+
+**Main Interface:**
+![Emailify Main UI](./images/emailify-main.png)
+
+**Generated Email Example:**
+![Emailify Result UI](./images/emailify-result.png)
