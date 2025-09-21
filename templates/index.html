@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emailify - AI Email Assistant</title>
+    <style>
+        /* Basic styling for a cleaner look */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
+        h1 { color: #4a4a4a; text-align: center; }
+        .form-container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px D10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ddd; box-sizing: border-box; font-size: 16px; font-family: inherit; }
+        textarea { resize: vertical; min-height: 100px; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #a0c7ff; cursor: not-allowed; }
+        #result { margin-top: 30px; background-color: #e9ecef; padding: 20px; border-radius: 8px; white-space: pre-wrap; font-family: Consolas, 'Courier New', monospace; line-height: 1.5; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Emailify AI Assistant</h1>
+
+    <div class="form-container">
+        <form id="email-form">
+            <div class="form-group">
+                <label for="recipient">Who is this email for?</label>
+                <input type="text" id="recipient" placeholder="e.g., My manager, a potential customer" required>
+            </div>
+            <div class="form-group">
+                <label for="goal">What is the goal of the email?</label>
+                <input type="text" id="goal" placeholder="e.g., Ask for a raise, follow up on a meeting" required>
+            </div>
+            <div class="form-group">
+                <label for="points">What key points must be included?</label>
+                <textarea id="points" placeholder="- Project X is complete&#10;- Need feedback by Friday&#10;- Attached the final report" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="tone">Select a tone:</label>
+                <select id="tone">
+                    <option value="Formal">Formal</option>
+                    <option value="Friendly" selected>Friendly</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Persuasive">Persuasive</option>
+                    <option value="Direct">Direct</option>
+                </select>
+            </div>
+             <div class="form-group">
+                <label for="name">Your Name (for signature)</label>
+                <input type="text" id="name" placeholder="e.g., Alex Smith" required>
+            </div>
+            <button type="submit" id="generate-btn">Generate Email</button>
+        </form>
+    </div>
+
+    <pre id="result" class="hidden">Your generated email will appear here...</pre>
+
+    <script>
+        // JavaScript to connect the form to our Python backend
+        const form = document.getElementById('email-form');
+        const resultDiv = document.getElementById('result');
+        const generateBtn = document.getElementById('generate-btn');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the form from reloading the page
+
+            // Show loading state
+            resultDiv.classList.remove('hidden');
+            resultDiv.textContent = '🧠 Generating your email...';
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Thinking...';
+
+            // Collect data from the form
+            const data = {
+                recipient: document.getElementById('recipient').value,
+                goal: document.getElementById('goal').value,
+                points: document.getElementById('points').value,
+                tone: document.getElementById('tone').value,
+                name: document.getElementById('name').value,
+            };
+
+            try {
+                // Send the data to our Flask backend API
+                const response = await fetch('/generate-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Display the result from the backend
+                resultDiv.textContent = result.email;
+
+            } catch (error) {
+                resultDiv.textContent = 'Sorry, an error occurred. Please check the console and try again.';
+                console.error('Error:', error);
+            } finally {
+                // Re-enable the button
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Email';
+            }
+        });
+    </script>
+</body>
+</html>
